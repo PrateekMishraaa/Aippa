@@ -1,0 +1,18 @@
+@import "@splidejs/react-splide/css";
+
+
+/* Change the default color of the dots */
+.splide__pagination__page {
+  background-color: #2356fe; /* Replace with your desired color */
+  opacity: 0.4;
+}
+.splide__pagination {
+  position: relative; /* Make it relative to its parent */
+  margin-top: 2rem; /* Add some space above the dots */
+  text-align: center; /* Center the dots */
+}
+
+/* Change the color of the active dot */
+.splide__pagination__page.is-active {
+  background-color: #2356fe; /* Replace with your desired color */
+}
