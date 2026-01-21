@@ -3,6 +3,8 @@ import { Route, Routes } from "react-router-dom";
 const PersonalityDevOutlet = lazy(() => import("@/pages/PersonalityDevOutlet"));
 import LoadingPage from "@/utils/LoadingPage";
 import { AnimatePresence } from "motion/react";
+import StudentDashboard from "./pages/StudentDashboard/StudentDashboard.jsx"
+import SignUp from "../src/pages/SignUp/SignUp.jsx"
 import useHooks from "./context/HookContext";
 import PageAnimation from "./utils/PageAnimation";
 import routesElements from "./routes/routeConstant";
@@ -100,6 +102,8 @@ const App = () => {
 							)
 						)}
 					</Route>
+					<Route path="/student/dashboard" element={<StudentDashboard/>}/>
+					<Route path="/sign-up" element={<SignUp/>}/>
 				</Routes>
 			</AnimatePresence>
 		</Suspense>

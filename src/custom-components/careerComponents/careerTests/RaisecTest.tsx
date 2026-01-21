@@ -3,6 +3,7 @@ import WrapperBox from "@/custom-components/WrapperBox";
 import { Progress } from "@/custom-components/customProgress";
 import questionImages, { optionImages } from "@/constants/careerRaisecTest";
 import { MoveLeft, MoveRight } from "lucide-react";
+import axios from "axios";
 import { toast } from "sonner";
 import useCareer from "@/context/careerContext/CareerContext";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -39,6 +40,7 @@ interface ICategoryScores {
 
 const RaisecTest = () => {
 	const { navigate } = useHooks();
+	const [questionData,setQuestionData] = useState([])
 	const { getQuestion: data, isLoading, test, attemptCount } = useCareer();
 	const queryClient = useQueryClient();
 	const [questions, setQuestions] = useState<IQuestions[]>([]);
