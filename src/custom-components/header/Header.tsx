@@ -10,9 +10,13 @@ import {
 	DropdownMenuShortcut,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+// components/Header.jsx
+// Line 21 fix karein (typo correction)
+import ThemeButton from "../../components/ui/ThemeButton/TheameButton.jsx"; // ✅ Correct spelling
 import links from "@/constants/headerLinks";
 import useAuth from "@/context/AuthContext";
 import useHooks from "@/context/HookContext";
+import { useNavigate } from "react-router-dom";
 import authServicesApi from "@/services/authService";
 import { clearIsLoggedInUser } from "@/store/slices/authSlice";
 import { GetState } from "@/store/store";
@@ -23,6 +27,7 @@ import { Link, NavLink } from "react-router-dom";
 import { toast } from "sonner";
 
 const Header = () => {
+	const navigatee = useNavigate()
 	const { isLoggedIn, setIsLoggedIn } = useAuth();
 	const { navigate } = useHooks();
 	const dispatch = useDispatch();
@@ -75,6 +80,9 @@ const Header = () => {
 								</div>
 							</Link>
 						</div>
+						<div className="ml-[62%]">	<ThemeButton/></div>
+
+
 
 						<div className="">
 							{isLoggedIn ? (
@@ -98,7 +106,7 @@ const Header = () => {
 										<DropdownMenuSeparator />
 
 										<DropdownMenuGroup>
-											<DropdownMenuItem>Profile</DropdownMenuItem>
+											<DropdownMenuItem onClick={()=>navigatee('/profile')}>Profile</DropdownMenuItem>
 											<DropdownMenuItem>Settings</DropdownMenuItem>
 										</DropdownMenuGroup>
 

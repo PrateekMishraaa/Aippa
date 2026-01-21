@@ -11,7 +11,8 @@ const CorrectionForm = lazy(() => import("@/pages/CorrectionForm"));
 const SignIn = lazy(() => import("@/pages/SignIn"));
 const NotFound = lazy(() => import("@/pages/NotFound"));
 const Competition = lazy(() => import("@/pages/Competition"));
-const cLsmt = lazy(() => import("@/custom-components/careerComponents/Lsmt"));
+const 
+cLsmt = lazy(() => import("@/custom-components/careerComponents/Lsmt"));
 const CRaisec = lazy(
 	() => import("@/custom-components/careerComponents/Raisec")
 );

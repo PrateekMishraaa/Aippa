@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { z } from "zod";
-import { toast } from "sonner";
+import Swal from 'sweetalert2';
 
 // Components
 import ContainerWrapper from "@/custom-components/ContainerWrapper";
@@ -56,7 +56,7 @@ const SignIn = () => {
       const { message, user, jwt } = data;
 
       if (!user || !jwt) {
-        toast.error("Invalid login response");
+        Swal.fire("Invalid Credentials");
         return;
       }
 
@@ -203,11 +203,11 @@ const SignIn = () => {
 
             {/* User Type Selector */}
             <div className="mb-8">
-              <label className="block text-sm font-medium text-gray-700 mb-3">
+              {/* <label className="block text-sm font-medium text-gray-700 mb-3">
                 Login as
-              </label>
+              </label> */}
               <div className="grid grid-cols-2 gap-3">
-                <Button
+                {/* <Button
                   type="button"
                   variant={userType === 0 ? "default" : "outline"}
                   onClick={() => setUserType(0)}
@@ -219,8 +219,8 @@ const SignIn = () => {
                   disabled={isLoading}
                 >
                   Student
-                </Button>
-                <Button
+                </Button> */}
+                {/* <Button
                   type="button"
                   variant={userType === 1 ? "default" : "outline"}
                   onClick={() => setUserType(1)}
@@ -232,7 +232,7 @@ const SignIn = () => {
                   disabled={isLoading}
                 >
                   Institute
-                </Button>
+                </Button> */}
               </div>
             </div>
 

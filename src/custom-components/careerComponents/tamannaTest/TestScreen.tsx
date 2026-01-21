@@ -126,15 +126,15 @@ const TestScreen = () => {
 	};
 
 	// note: Fetch questions for the active test section -----
-	const { data } = useQuery({
+	const { data, isLoading, isError } = useQuery({
 		queryKey: ["tamannaQuestions", activeTab],
 		queryFn: () => careerServicesApi.getTamannaQuestion(activeTab),
 		enabled: !!loggedInUser,
 	});
 
 	useEffect(() => {
-		if (data) {
-			const fetchedQuestions = data.data.result.map((q: Question) => ({
+		if (data && data.data?.result) {
+			const fetchedQuestions = data.data.result.map((q: any) => ({
 				id: q.id,
 				question: q.question || "",
 				questionImg: q.questionImg || "",
@@ -151,11 +151,18 @@ const TestScreen = () => {
 			setCurrentQuestionIndex(0);
 			setAttemptedQuestions([]);
 			setTimeLeft(600);
+		} else {
+			// Reset questions if no data
+			setQuestions([]);
+			setCurrentQuestionIndex(0);
+			setAttemptedQuestions([]);
 		}
 	}, [data, activeTab]);
 
 	// note: Handle the option selection for the current question -----
 	const handleOptionChange = (selectedKey: string) => {
+		if (!questions[currentQuestionIndex]) return;
+
 		setQuestions((prevQuestions) =>
 			prevQuestions.map((q) =>
 				q.id === questions[currentQuestionIndex].id
@@ -184,14 +191,20 @@ const TestScreen = () => {
 
 	// note: Handle question selection from the question count menu -----
 	const handleQuestionClick = (index: number) => {
-		setCurrentQuestionIndex(index);
+		if (index >= 0 && index < questions.length) {
+			setCurrentQuestionIndex(index);
+		}
 	};
 
 	// note: Update progress bar based on attempted questions -----
 	useEffect(() => {
-		setProgress(
-			Math.round(+(attemptedQuestions.length / questions.length) * 100)
-		);
+		if (questions.length > 0) {
+			setProgress(
+				Math.round(+(attemptedQuestions.length / questions.length) * 100)
+			);
+		} else {
+			setProgress(0);
+		}
 	}, [attemptedQuestions, questions]);
 
 	// note:  Move to the next question in the test -----
@@ -289,6 +302,56 @@ const TestScreen = () => {
 		});
 	};
 
+	// Get current question safely
+	const currentQuestion = questions[currentQuestionIndex];
+
+	// Loading state
+	if (isLoading && questions.length === 0) {
+		return (
+			<div className="flex items-center justify-center min-h-[60vh]">
+				<div className="text-center">
+					<div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+					<p className="text-gray-600">Loading questions...</p>
+				</div>
+			</div>
+		);
+	}
+
+	// Error state
+	if (isError) {
+		return (
+			<div className="flex items-center justify-center min-h-[60vh]">
+				<div className="text-center text-red-600">
+					<p className="text-lg font-semibold">Failed to load questions</p>
+					<p className="text-sm mt-2">Please try again later</p>
+				</div>
+			</div>
+		);
+	}
+
+	// No questions state
+	if (questions.length === 0 && !isLoading) {
+		return (
+			<div className="flex items-center justify-center min-h-[60vh]">
+				<div className="text-center">
+					<div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
+						<svg className="w-8 h-8 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+							<path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.928-.833-2.698 0L4.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+						</svg>
+					</div>
+					<h3 className="text-lg font-semibold text-gray-800 mb-2">No Questions Available</h3>
+					<p className="text-gray-600 mb-4">There are no questions available for this section.</p>
+					<button
+						onClick={() => navigate("/career")}
+						className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+					>
+						Back to Career
+					</button>
+				</div>
+			</div>
+		);
+	}
+
 	return (
 		<>
 			{!isBreak ? (
@@ -315,7 +378,6 @@ const TestScreen = () => {
 													"bg-tamannaGreen text-slate-100"
 												} w-8 h-8 flex items-center justify-center border border-tamannaGreen rounded-full cursor-pointer relative`}
 												key={q.id}
-												// attempted={attemptedQuestions.includes(q.id)}
 												onClick={() => handleQuestionClick(index)}
 											>
 												{index === currentQuestionIndex && (
@@ -389,15 +451,15 @@ const TestScreen = () => {
 
 								{/* Question Text */}
 								<h3 className="text-slate-900">
-									Question: {questions[currentQuestionIndex].question}
+									Question: {currentQuestion?.question || "No question text available"}
 								</h3>
 
 								{/* Question Image */}
 								{/* todo: update question images size. image is not available */}
-								{questions[currentQuestionIndex]?.questionImg && (
+								{currentQuestion?.questionImg && (
 									<div>
 										<img
-											src={questions[currentQuestionIndex]?.questionImg}
+											src={currentQuestion.questionImg}
 											alt="Question"
 											className=""
 										/>
@@ -406,10 +468,10 @@ const TestScreen = () => {
 
 								{/* Option Image */}
 								{/* todo: update question images size. image is not available */}
-								{questions[currentQuestionIndex]?.optionImg && (
+								{currentQuestion?.optionImg && (
 									<div>
 										<img
-											src={questions[currentQuestionIndex]?.optionImg}
+											src={currentQuestion.optionImg}
 											alt="Option"
 											className=""
 										/>
@@ -418,11 +480,9 @@ const TestScreen = () => {
 
 								{/* Select the Option from options */}
 								<RadioGroup
-									value={String(
-										questions[currentQuestionIndex]?.selectedOption
-									)}
+									value={String(currentQuestion?.selectedOption || "")}
 								>
-									{questions[currentQuestionIndex]?.option?.map(
+									{currentQuestion?.option?.map(
 										(option, answerI) => (
 											<div
 												className="flex items-center justify-between px-5 py-3 rounded-lg border border-blue-600"
@@ -442,7 +502,7 @@ const TestScreen = () => {
 												/>
 											</div>
 										)
-									)}
+									) || <p className="text-gray-500">No options available</p>}
 								</RadioGroup>
 
 								{/* progress bar */}
@@ -458,9 +518,18 @@ const TestScreen = () => {
 									<div className="flex space-x-3">
 										<button
 											onClick={handlePrev}
-											className="border p-2 rounded-full flex items-center bg-blue-100"
+											disabled={currentQuestionIndex === 0}
+											className={`border p-2 rounded-full flex items-center ${
+												currentQuestionIndex === 0 
+													? "bg-gray-100 cursor-not-allowed" 
+													: "bg-blue-100"
+											}`}
 										>
-											<div className="bg-blue-500 text-white rounded-full h-7 w-7 flex items-center justify-center">
+											<div className={`rounded-full h-7 w-7 flex items-center justify-center ${
+												currentQuestionIndex === 0 
+													? "bg-gray-400 text-white" 
+													: "bg-blue-500 text-white"
+											}`}>
 												<ChevronLeft />
 											</div>
 											<p className="px-3">Previous</p>
@@ -468,11 +537,20 @@ const TestScreen = () => {
 
 										<button
 											onClick={handleNext}
-											className="border p-2 rounded-full flex items-center bg-blue-100"
+											disabled={currentQuestionIndex === questions.length - 1}
+											className={`border p-2 rounded-full flex items-center ${
+												currentQuestionIndex === questions.length - 1 
+													? "bg-gray-100 cursor-not-allowed" 
+													: "bg-blue-100"
+											}`}
 										>
 											<p className="px-3">Next</p>
 
-											<div className="bg-blue-500 text-white rounded-full h-7 w-7 flex items-center justify-center">
+											<div className={`rounded-full h-7 w-7 flex items-center justify-center ${
+												currentQuestionIndex === questions.length - 1 
+													? "bg-gray-400 text-white" 
+													: "bg-blue-500 text-white"
+											}`}>
 												<ChevronRight />
 											</div>
 										</button>
@@ -481,7 +559,7 @@ const TestScreen = () => {
 									{/* finish button */}
 									<div>
 										<AlertDialog>
-											<AlertDialogTrigger className="border p-2 rounded-full flex items-center bg-blue-100">
+											<AlertDialogTrigger className="border p-2 rounded-full flex items-center bg-blue-100 hover:bg-blue-200 transition-colors">
 												<p className="px-3">Finish</p>
 
 												<div className="bg-blue-500 text-white rounded-full h-7 w-7 flex items-center justify-center">
