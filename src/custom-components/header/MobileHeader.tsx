@@ -46,8 +46,8 @@ const MobileHeader = () => {
 	const { mutateAsync } = useMutation({
 		mutationFn: () => authServicesApi.signOut(),
 		onSuccess: () => {
-			localStorage.removeItem("token");
-			localStorage.removeItem("id");
+			// localStorage.removeItem("token");
+			// localStorage.removeItem("id");
 			dispatch(clearIsLoggedInUser());
 			setIsLoggedIn(false);
 			navigate("/");

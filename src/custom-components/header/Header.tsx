@@ -10,6 +10,7 @@ import {
 	DropdownMenuShortcut,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { FaUser } from "react-icons/fa";
 // components/Header.jsx
 // Line 21 fix karein (typo correction)
 import ThemeButton from "../../components/ui/ThemeButton/TheameButton.jsx"; // ✅ Correct spelling
@@ -38,8 +39,8 @@ const Header = () => {
 	const { mutateAsync } = useMutation({
 		mutationFn: () => authServicesApi.signOut(),
 		onSuccess: () => {
-			localStorage.removeItem("token");
-			localStorage.removeItem("id");
+			// localStorage.removeItem("token");
+			// localStorage.removeItem("id");
 			dispatch(clearIsLoggedInUser());
 			setIsLoggedIn(false);
 			navigate("/");
@@ -80,7 +81,7 @@ const Header = () => {
 								</div>
 							</Link>
 						</div>
-						<div className="ml-[62%]">	<ThemeButton/></div>
+						<div className="ml-[72%]">	<ThemeButton/></div>
 
 
 
@@ -89,11 +90,23 @@ const Header = () => {
 								<DropdownMenu>
 									<DropdownMenuTrigger className="outline-none uppercase">
 										<Avatar>
-											<AvatarImage src={`${loggedInUser?.profile}`} />
-											<AvatarFallback>
-												{loggedInUser?.first_name[0]}
-												{loggedInUser?.last_name[0]}
-											</AvatarFallback>
+											{loggedInUser?.profile ? (
+												<AvatarImage 
+													src={loggedInUser.profile} 
+													alt={`${loggedInUser?.first_name} ${loggedInUser?.last_name}`}
+												/>
+											) : (
+												<AvatarFallback className="bg-yuvaBlue/20 text-yuvaBlue">
+													{loggedInUser?.first_name?.[0] ? (
+														<>
+															{loggedInUser.first_name[0].toUpperCase()}
+															{loggedInUser?.last_name?.[0]?.toUpperCase()}
+														</>
+													) : (
+														<FaUser className="w-4 h-4" />
+													)}
+												</AvatarFallback>
+											)}
 										</Avatar>
 									</DropdownMenuTrigger>
 
@@ -105,8 +118,8 @@ const Header = () => {
 										)}
 										<DropdownMenuSeparator />
 
-										<DropdownMenuGroup>
 											<DropdownMenuItem onClick={()=>navigatee('/profile')}>Profile</DropdownMenuItem>
+										<DropdownMenuGroup>
 											<DropdownMenuItem>Settings</DropdownMenuItem>
 										</DropdownMenuGroup>
 
@@ -132,14 +145,14 @@ const Header = () => {
 					</div>
 
 					{/*  header links */}
-					<div className="w-full px-5 flex justify-between lg:justify-center md:gap-1 lg:gap-5 items-center">
+					<div className="w-full   flex justify-between lg:justify-center md:gap-1 lg:gap-5 items-center">
 						{links(isLoggedIn).map(
 							({ routeName, path, isActive }) =>
 								isActive && (
 									<NavLink
 										key={routeName}
 										to={path}
-										className="capitalize font-semibold text-xs lg:text-base px-2 py-2"
+										className="capitalize font-semibold text-xs lg:text-base px-2 "
 										style={({ isActive }) => ({
 											color: isActive ? "#2257fe" : "",
 											borderBottom: isActive ? "2px solid #2257fe" : "",

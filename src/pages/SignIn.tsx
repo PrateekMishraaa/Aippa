@@ -73,7 +73,7 @@ const SignIn = () => {
       });
 
       // Show success message
-      toast.success(message || "Login successful");
+    Swal.fire("You Are Login Successfully");;
 
       // Navigate after delay
       setTimeout(() => {
@@ -97,7 +97,7 @@ const SignIn = () => {
                           error.message || 
                           "Login failed";
 
-      toast.error(errorMessage);
+       Swal.fire("Invalid Credentials");;
     }
   });
 
@@ -121,11 +121,11 @@ const SignIn = () => {
     if (userType === 0) {
       form.setValue("user", "testnewuser@test.com");
       form.setValue("password", "Test@1234567890");
-      toast.info("Test student credentials filled");
+      Swal.fire("Test Student Credentials Failed");;
     } else if (userType === 1) {
       form.setValue("user", "modelg20@yuvamanthan.org");
       form.setValue("password", "Test@1234567890");
-      toast.info("Test institute credentials filled");
+       Swal.fire("Test Institute  Credentials Failed");;
     }
   };
 

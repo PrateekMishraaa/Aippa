@@ -13,6 +13,7 @@ import careerServicesApi, {
 import useHooks from "@/context/HookContext";
 import { useSelector } from "react-redux";
 import { GetState } from "@/store/store";
+import { useTheme } from "@/context/ThemeContext/ThemeContext"; // Add theme context
 
 interface Option {
 	text: string;
@@ -38,7 +39,6 @@ interface ICategoryScores {
 	c: number;
 }
 
-// Update the ApiResponse interface to match your actual API response
 interface ApiResponse {
 	result: IQuestions[];
 	message?: string;
@@ -67,6 +67,10 @@ const RaisecTest = () => {
 	const loggedInUser = useSelector(
 		(state: GetState) => state.authSlice.isLoggedInUser
 	);
+	
+	// Add theme context
+	const { theme } = useTheme();
+	const isDark = theme === 'dark';
 
 	// Note: post lsmt test result (score)
 	const { mutateAsync } = useMutation({
@@ -93,10 +97,8 @@ const RaisecTest = () => {
 		}
 	}, [currQuesIndex, questionData.length]);
 
-	// Fixed API call with proper typing and error handling
 	useEffect(() => {
 		const fetchQuestionData = async () => {
-			// Only fetch if we don't have data from useCareer and we haven't loaded yet
 			if ((!data || !data.data?.result || data.data.result.length === 0) && !loadingQuestions && questionData.length === 0) {
 				setLoadingQuestions(true);
 				setError(null);
@@ -172,7 +174,6 @@ const RaisecTest = () => {
 			return;
 		}
 
-		// Check if all questions are answered
 		const unansweredQuestions = responses.filter(response => response === null);
 		if (unansweredQuestions.length > 0) {
 			toast.error(`Please answer all questions. ${unansweredQuestions.length} question(s) remaining.`);
@@ -208,18 +209,35 @@ const RaisecTest = () => {
 		}
 	};
 
+	// Theme-based classes
+	const textClass = isDark ? 'text-gray-300' : 'text-gray-800';
+	const mutedTextClass = isDark ? 'text-gray-400' : 'text-gray-600';
+	const bgClass = isDark ? 'bg-gray-800' : 'bg-gray-50';
+	const borderClass = isDark ? 'border-gray-700' : 'border-gray-200';
+	const optionBgClass = isDark ? 'bg-gray-900' : 'bg-white';
+	const optionHoverClass = isDark ? 'hover:bg-gray-800 hover:border-blue-700' : 'hover:bg-gray-50 hover:border-blue-300';
+	const optionSelectedBgClass = isDark ? 'bg-blue-900/30 border-blue-700' : 'bg-blue-50 border-blue-500';
+	const buttonDisabledClass = isDark ? 'bg-gray-800 text-gray-500 cursor-not-allowed' : 'bg-gray-100 text-gray-400 cursor-not-allowed';
+	const optionIconBgClass = isDark ? 'bg-gray-800' : 'bg-gray-100';
+	const questionBgClass = isDark ? 'bg-gray-900/50' : 'bg-gray-50';
+	const buttonPrimaryClass = isDark ? 'bg-blue-600 hover:bg-blue-700' : 'bg-blue-500 hover:bg-blue-600';
+	const buttonSuccessClass = isDark ? 'bg-green-600 hover:bg-green-700' : 'bg-green-500 hover:bg-green-600';
+	const imageBorderClass = isDark ? 'border-gray-700' : 'border-gray-300';
+	const successTextClass = isDark ? 'text-green-400' : 'text-green-600';
+	const infoTextClass = isDark ? 'text-blue-400' : 'text-blue-600';
+
 	// Get current question
 	const currentQuestion = questionData[currQuesIndex];
 	
-	// Get question image - make sure you have enough images or use a fallback
+	// Get question image
 	const questionImage = questionImages[currQuesIndex % questionImages.length] || questionImages[0];
 
 	if ((loadingQuestions || isLoading) && questionData.length === 0) {
 		return (
 			<WrapperBox>
-				<div className="text-center py-10">
-					<div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto"></div>
-					<p className="mt-4">Loading questions...</p>
+				<div className={`text-center py-10 ${textClass}`}>
+					<div className={`animate-spin rounded-full h-12 w-12 border-b-2 ${isDark ? 'border-gray-300' : 'border-gray-900'} mx-auto`}></div>
+					<p className={`mt-4 ${mutedTextClass}`}>Loading questions...</p>
 				</div>
 			</WrapperBox>
 		);
@@ -228,11 +246,11 @@ const RaisecTest = () => {
 	if (error && questionData.length === 0) {
 		return (
 			<WrapperBox>
-				<div className="text-center py-10 text-red-500">
+				<div className={`text-center py-10 ${isDark ? 'text-red-400' : 'text-red-500'}`}>
 					<p className="text-lg font-semibold">{error}</p>
 					<button 
 						onClick={() => window.location.reload()}
-						className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+						className={`mt-4 px-4 py-2 ${buttonPrimaryClass} text-white rounded`}
 					>
 						Try Again
 					</button>
@@ -244,7 +262,7 @@ const RaisecTest = () => {
 	if (questionData.length === 0) {
 		return (
 			<WrapperBox>
-				<div className="text-center py-10">
+				<div className={`text-center py-10 ${textClass}`}>
 					<p>No questions available at the moment.</p>
 				</div>
 			</WrapperBox>
@@ -257,10 +275,10 @@ const RaisecTest = () => {
 			<div className="space-y-5 mb-8">
 				<Progress value={progress} />
 				<div className="flex justify-between items-center">
-					<p className="text-sm text-gray-600">
+					<p className={`text-sm ${mutedTextClass}`}>
 						Progress: {Math.round(progress)}%
 					</p>
-					<p className="text-sm text-gray-600">
+					<p className={`text-sm ${mutedTextClass}`}>
 						Question {currQuesIndex + 1} of {questionData.length}
 					</p>
 				</div>
@@ -269,10 +287,10 @@ const RaisecTest = () => {
 			{/* Question */}
 			<div className="sm:flex items-center justify-between mb-8 gap-6">
 				<div className="flex-1">
-					<h3 className="text-xl font-semibold mb-4">Question :</h3>
-					<div className="bg-gray-50 p-4 rounded-lg">
-						<p className="py-3 text-lg">
-							<span className="font-medium">Q{currQuesIndex + 1}:</span> {currentQuestion?.text}
+					<h3 className={`text-xl font-semibold mb-4 ${textClass}`}>Question :</h3>
+					<div className={`${questionBgClass} p-4 rounded-lg ${borderClass} border`}>
+						<p className={`py-3 text-lg ${textClass}`}>
+							<span className={`font-medium ${textClass}`}>Q{currQuesIndex + 1}:</span> {currentQuestion?.text}
 						</p>
 					</div>
 				</div>
@@ -282,7 +300,7 @@ const RaisecTest = () => {
 						<img
 							src={questionImage}
 							alt={currentQuestion?.text || "Question image"}
-							className="w-36 h-36 object-cover p-1 border rounded-lg"
+							className={`w-36 h-36 object-cover p-1 border rounded-lg ${imageBorderClass}`}
 						/>
 					</div>
 				)}
@@ -291,7 +309,7 @@ const RaisecTest = () => {
 			{/* Select options */}
 			<div className="sm:flex justify-between items-end">
 				<div className="flex-1">
-					<h3 className="text-xl font-semibold mb-4">Select your answer:</h3>
+					<h3 className={`text-xl font-semibold mb-4 ${textClass}`}>Select your answer:</h3>
 					<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 						{currentQuestion &&
 							currentQuestion.option.map((optionObj, index) => (
@@ -300,16 +318,15 @@ const RaisecTest = () => {
 									onClick={() => handleOptionClick(index)}
 									className={`
 										border-2 rounded-lg cursor-pointer transition-all duration-200 
-										hover:bg-gray-50 hover:border-blue-300 select-none p-4
-										flex items-center gap-4
+										select-none p-4 flex items-center gap-4
 										${responses[currQuesIndex] === index
-											? "bg-blue-50 border-blue-500"
-											: "border-gray-200 bg-white"
+											? `${optionSelectedBgClass}`
+											: `${optionBgClass} ${borderClass} ${optionHoverClass}`
 										}
 									`}
 								>
 									<div className="flex-shrink-0">
-										<div className="w-10 h-10 flex items-center justify-center rounded-full bg-gray-100">
+										<div className={`w-10 h-10 flex items-center justify-center rounded-full ${optionIconBgClass}`}>
 											{optionImages[index] ? (
 												<img 
 													src={optionImages[index]} 
@@ -317,14 +334,14 @@ const RaisecTest = () => {
 													className="w-6 h-6"
 												/>
 											) : (
-												<span className="font-semibold">{String.fromCharCode(65 + index)}</span>
+												<span className={`font-semibold ${textClass}`}>{String.fromCharCode(65 + index)}</span>
 											)}
 										</div>
 									</div>
 									<div>
-										<p className="font-medium">{optionObj.text}</p>
+										<p className={`font-medium ${textClass}`}>{optionObj.text}</p>
 										{responses[currQuesIndex] === index && (
-											<p className="text-sm text-green-600 mt-1">✓ Selected</p>
+											<p className={`text-sm mt-1 ${successTextClass}`}>✓ Selected</p>
 										)}
 									</div>
 								</div>
@@ -341,8 +358,8 @@ const RaisecTest = () => {
 							className={`
 								flex items-center gap-2 px-4 py-2 rounded-lg transition-colors
 								${currQuesIndex === 0
-									? "bg-gray-100 text-gray-400 cursor-not-allowed"
-									: "bg-blue-500 text-white hover:bg-blue-600 cursor-pointer"
+									? `${buttonDisabledClass}`
+									: `${buttonPrimaryClass} text-white cursor-pointer`
 								}
 							`}
 						>
@@ -356,8 +373,8 @@ const RaisecTest = () => {
 								className={`
 									flex items-center gap-2 px-4 py-2 rounded-lg transition-colors
 									${currQuesIndex === questionData.length - 1
-										? "bg-gray-100 text-gray-400 cursor-not-allowed"
-										: "bg-blue-500 text-white hover:bg-blue-600 cursor-pointer"
+										? `${buttonDisabledClass}`
+										: `${buttonPrimaryClass} text-white cursor-pointer`
 									}
 								`}
 							>
@@ -366,7 +383,7 @@ const RaisecTest = () => {
 						) : (
 							<button
 								onClick={handleSubmit}
-								className="flex items-center gap-2 px-6 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors cursor-pointer"
+								className={`flex items-center gap-2 px-6 py-2 ${buttonSuccessClass} text-white rounded-lg transition-colors cursor-pointer`}
 							>
 								Submit Test
 							</button>
@@ -374,36 +391,36 @@ const RaisecTest = () => {
 					</div>
 					
 					{isCompleted && (
-						<p className="mt-4 text-green-600 text-sm text-center">
+						<p className={`mt-4 text-sm text-center ${successTextClass}`}>
 							✓ All questions answered! Click Submit to finish.
 						</p>
 					)}
 					
 					{responses[currQuesIndex] !== null && !isCompleted && (
-						<p className="mt-4 text-blue-600 text-sm text-center">
+						<p className={`mt-4 text-sm text-center ${infoTextClass}`}>
 							✓ Answer saved. Move to next question.
 						</p>
 					)}
 				</div>
 			</div>
 
-			{/* Quick navigation dots */}
+			{/* Optional: Quick navigation dots (uncomment if needed) */}
 			{/* <div className="mt-12">
-				<h4 className="text-lg font-semibold mb-4">Question Navigation:</h4>
+				<h4 className={`text-lg font-semibold mb-4 ${textClass}`}>Question Navigation:</h4>
 				<div className="flex flex-wrap gap-2">
 					{questionData.map((_, index) => (
 						<button
 							key={index}
 							onClick={() => setCurrQuesIndex(index)}
 							className={`
-								w-10 h-10 rounded-full flex items-center justify-center text-sm
+								w-10 h-10 rounded-full flex items-center justify-center text-sm transition-colors
 								${index === currQuesIndex
-									? "bg-blue-500 text-white"
+									? `${buttonPrimaryClass} text-white`
 									: responses[index] !== null
-									? "bg-green-100 text-green-700 border border-green-300"
-									: "bg-gray-100 text-gray-700 border border-gray-300"
+									? `${isDark ? 'bg-green-900/30 text-green-300 border-green-700' : 'bg-green-100 text-green-700 border-green-300'} border`
+									: `${isDark ? 'bg-gray-800 text-gray-300 border-gray-700' : 'bg-gray-100 text-gray-700 border-gray-300'} border`
 								}
-								hover:bg-blue-100 hover:text-blue-700 transition-colors
+								${isDark ? 'hover:bg-gray-700 hover:text-gray-300' : 'hover:bg-gray-200 hover:text-gray-900'}
 							`}
 						>
 							{index + 1}

@@ -78,7 +78,7 @@ class authServicesApi {
     try {
       // OLD API use करें जो काम कर रही है
       const type = data.type || 0; // default student
-      const response = await axiosInstance.post(`/auth/login?type=${type}`, {
+      const response = await axiosInstance.post(`/v2/auth/login?type=${type}`, {
         identifier: data.user,  // "identifier" field use करें
         password: data.password
       });
